@@ -1,0 +1,1 @@
+<?php require_once(SRC_PATH . '/template/sidebar.php'); ?>
