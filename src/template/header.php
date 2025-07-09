@@ -43,7 +43,7 @@
         </button>
       <?php endif; ?>
 
-      <ul class="navbar-links flex flex-row items-center" role="navigation">
+      <ul class="navbar-links" role="navigation">
         <?php if (isset($_SESSION['user_id'])): ?>
           <li><a href="/?page=produits" tabindex="0"><i class="fa-solid fa-box"></i> Produits</a></li>
           <li><a href="/?page=maintenance" tabindex="0"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance</a></li>

@@ -80,3 +80,9 @@ Stack trace:
 #2 /var/www/html/public/index.php(112): require_once('/var/www/html/s...')
 #3 {main}
   thrown in /var/www/html/src/model/model-journal.php on line 48
+[09-Jul-2025 04:53:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function getDB() in /var/www/html/src/model/model-maintenance.php:5
+Stack trace:
+#0 /var/www/html/src/controller/controller-maintenance.php(34): getMaintenancesActives()
+#1 /var/www/html/public/index.php(124): require_once('/var/www/html/s...')
+#2 {main}
+  thrown in /var/www/html/src/model/model-maintenance.php on line 5
