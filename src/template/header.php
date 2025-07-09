@@ -1,6 +1,4 @@
-
-
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -29,44 +27,41 @@
 </head>
 
 <body>
-  <nav class="navbar clair">
-    <div class="container navbar-container">
-
-      <a href="/?page=accueil" class="navbar-logo" aria-label="Page d’accueil Orchi">
+  <header class="navbar">
+    <div class="container-bento">
+      <a href="/?page=accueil" class="navbar-logo" aria-label="Page d’accueil Orchi" tabindex="0">
         <img src="/assets/icons/logo-blanc/webp/projet-fil-rouge300x300-main-blanche.webp"
              alt="Logo Orchi"
-             class="logo-img"
              loading="lazy">
       </a>
 
       <?php if (isset($_SESSION['user_id'])): ?>
-      <button class="navbar-toggle" aria-label="Ouvrir/fermer le menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-      <?php endif; ?>
-
-<ul class="navbar-links">
-  <?php if (isset($_SESSION['user_id'])): ?>
-    <li><a href="/?page=produits">Produits</a></li>
-    <li><a href="/?page=maintenance">Maintenance</a></li>
-    <?php if (isset($_SESSION['niveau']) && $_SESSION['niveau'] === 'admin'): ?>
-      <li><a href="/?page=notifications">Notifications</a></li>
-      <li><a href="/?page=utilisateurs">Utilisateurs</a></li>
-    <?php endif; ?>
-  <?php endif; ?>
-</ul>
-
-
-      <?php if (isset($_SESSION['user_id'])): ?>
-        <button class="navbar-avatar-btn" aria-label="Ouvrir le menu utilisateur">
-          <img src="<?= htmlspecialchars($_SESSION['utilisateur_photo'] ?? '/assets/images/utilisateurs/default.jpg') ?>"
-              alt="Photo utilisateur"
-              class="navbar-avatar"
-              id="navbarAvatar">
+        <button class="navbar-toggle" aria-label="Ouvrir ou fermer le menu" tabindex="0">
+          <span class="barre"></span>
+          <span class="barre"></span>
+          <span class="barre"></span>
         </button>
       <?php endif; ?>
 
+      <ul class="navbar-links flex flex-row items-center" role="navigation">
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <li><a href="/?page=produits" tabindex="0"><i class="fa-solid fa-box"></i> Produits</a></li>
+          <li><a href="/?page=maintenance" tabindex="0"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance</a></li>
+          <?php if (isset($_SESSION['niveau']) && $_SESSION['niveau'] === 'admin'): ?>
+            <li><a href="/?page=notifications" tabindex="0"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+            <li><a href="/?page=utilisateurs" tabindex="0"><i class="fa-solid fa-users"></i> Utilisateurs</a></li>
+          <?php endif; ?>
+        <?php endif; ?>
+      </ul>
+
+      <?php if (isset($_SESSION['user_id'])): ?>
+        <button class="navbar-avatar" aria-label="Ouvrir le menu utilisateur" tabindex="0">
+          <img src="<?= htmlspecialchars($_SESSION['utilisateur_photo'] ?? '/assets/images/utilisateurs/default.jpg') ?>"
+               alt="Photo utilisateur"
+               class="user-photo"
+               id="navbarAvatar"
+               loading="lazy">
+        </button>
+      <?php endif; ?>
     </div>
-  </nav>
+  </header>

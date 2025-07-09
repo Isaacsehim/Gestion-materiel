@@ -2,67 +2,67 @@
 
 require_once(SRC_PATH . '/model/model-utilisateurs.php');
 
-$erreur = '';
-$success = '';
+$success = $success ?? ($_GET['success'] ?? '');
+$erreur = $erreur ?? ($_GET['error'] ?? '');
 $id = (int)($_GET['id'] ?? 0);
 
-if (!$id || !($utilisateur = getUserById($id))) {
+$utilisateur = getUserById($id);
+if (!$id || !$utilisateur) {
     die("Utilisateur introuvable.");
 }
 
 $niveaux = getNiveaux();
 $etats = getEtats();
 
-$nom = $utilisateur['utilisateur_nom'];
-$prenom = $utilisateur['utilisateur_prenom'];
-$pseudo = $utilisateur['utilisateur_pseudo'];
-$email = $utilisateur['utilisateur_email'];
-$theme = $utilisateur['utilisateur_theme'];
-$niveau = $utilisateur['id_niveaux'];
-$etat = $utilisateur['id_etats_utilisateurs'];
-$notifications = $utilisateur['utilisateur_notifications'];
-$photoActuelle = $utilisateur['utilisateur_photo'];
-
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+$nom            = $utilisateur['utilisateur_nom'];
+$prenom         = $utilisateur['utilisateur_prenom'];
+$pseudo         = $utilisateur['utilisateur_pseudo'];
+$email          = $utilisateur['utilisateur_email'];
+$theme          = $utilisateur['utilisateur_theme'];
+$niveau         = $utilisateur['id_niveaux'];
+$etat           = $utilisateur['id_etats_utilisateurs'];
+$notifications  = $utilisateur['utilisateur_notifications'];
+$photoActuelle  = $utilisateur['utilisateur_photo'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die('Requête invalide (CSRF).');
+
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die('Requête invalide – CSRF.');
     }
 
-    $nom = trim($_POST['nom'] ?? '');
-    $prenom = trim($_POST['prenom'] ?? '');
-    $pseudo = trim($_POST['pseudo'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $theme = $_POST['theme'] ?? 'clair';
-    $niveau = (int)($_POST['niveau'] ?? 0);
-    $etat = (int)($_POST['etat'] ?? 0);
+    $nom     = trim($_POST['nom'] ?? '');
+    $prenom  = trim($_POST['prenom'] ?? '');
+    $pseudo  = trim($_POST['pseudo'] ?? '');
+    $email   = trim($_POST['email'] ?? '');
+    $theme   = $_POST['theme'] ?? 'clair';
+    $niveau  = (int)($_POST['niveau'] ?? 0);
+    $etat    = (int)($_POST['etat'] ?? 0);
     $notifications = isset($_POST['notifications']) ? 1 : 0;
-
     $nouveauMDP = $_POST['motdepasse'] ?? '';
 
-    if (empty($nom) || empty($prenom) || empty($pseudo) || empty($email)) {
+    if (!$nom || !$prenom || !$pseudo || !$email) {
         $erreur = "Tous les champs obligatoires doivent être remplis.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erreur = "Adresse email invalide.";
+    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,20}$/', $pseudo)) {
+        $erreur = "Le pseudo doit contenir uniquement lettres, chiffres ou _ (3 à 20 caractères).";
     } elseif (!in_array($theme, ['clair', 'sombre'])) {
         $erreur = "Thème invalide.";
     } else {
         $photo = $photoActuelle;
         if (!empty($_FILES['photo']['name']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            $fileType = mime_content_type($_FILES['photo']['tmp_name']);
-            if (!in_array($fileType, $allowedTypes)) {
-                $erreur = "Format d'image non autorisé (jpg, png, webp seulement).";
+            $type = mime_content_type($_FILES['photo']['tmp_name']);
+            if (!in_array($type, $allowedTypes)) {
+                $erreur = "Format image non autorisé (jpg, png, webp).";
             } else {
                 $uploadDir = PUBLIC_PATH . '/assets/images/utilisateurs/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0775, true);
-                }
-                $filename = uniqid('profil_') . '_' . basename($_FILES['photo']['name']);
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
+
+                $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid('profil_') . '.' . $ext;
                 $targetPath = $uploadDir . $filename;
+
                 if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath)) {
                     $photo = 'assets/images/utilisateurs/' . $filename;
                 } else {
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'utilisateur_notifications' => $notifications,
                 'id_niveaux'                => $niveau,
                 'id_etats_utilisateurs'     => $etat,
-                'utilisateur_photo'         => $photo,
+                'utilisateur_photo'         => $photo
             ];
 
             $mdp_a_modifier = false;
@@ -91,7 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (updateUser($id, $data, $mdp_a_modifier)) {
-                $success = "L'utilisateur a bien été modifié.";
+                header("Location: /?page=update-utilisateur&id=$id&success=" . urlencode("La modification a été effectuée avec succès."));
+exit;
+
                 $utilisateur = getUserById($id);
             } else {
                 $erreur = "Erreur lors de la mise à jour.";

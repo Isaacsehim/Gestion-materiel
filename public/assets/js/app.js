@@ -23,17 +23,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarPhoto = document.getElementById('sidebarPhoto');
 
   if (sidebar && navbarAvatar) {
-    navbarAvatar.addEventListener('click', () => {
+    navbarAvatar.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('active');
     });
   }
   if (sidebar && sidebarPhoto) {
-    sidebarPhoto.addEventListener('click', () => {
+    sidebarPhoto.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('active');
     });
   }
 
-function showToast(message, type = 'success', duration = 3000) {
+
+  document.addEventListener('click', (e) => {
+    if (sidebar && sidebar.classList.contains('active')) {
+      if (!sidebar.contains(e.target) && e.target !== navbarAvatar && e.target !== sidebarPhoto) {
+        sidebar.classList.remove('active');
+      }
+    }
+  });
+
+function showToast(message, type = 'success', duration = 10000) {
   let container = document.querySelector('.toast-container');
   if (!container) {
     container = document.createElement('div');

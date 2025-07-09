@@ -5,20 +5,32 @@ require_once(SRC_PATH . '/model/model-journal.php');
 $erreur = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    // ✅ Sécurité CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die('Requête invalide – sécurité CSRF');
+    }
 
-    if ($action === 'login') {
-        $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
+    // Récupération et nettoyage
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
+
+    if (!preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username)) {
+        $erreur = "Identifiant invalide. Lettres, chiffres et _ uniquement.";
+    } else {
         $user = getUserByPseudo($username);
 
         if ($user) {
-            if (password_verify($password, $user['utilisateur_motdepasse'])) {
+
+            if (!empty($user['utilisateur_est_supprime'])) {
+                $erreur = "Ce compte a été supprimé ou archivé.";
+            }
+
+            elseif (password_verify($password, $user['utilisateur_motdepasse'])) {
+
                 $_SESSION['user_id'] = $user['id_utilisateurs'];
                 $_SESSION['user'] = $user['utilisateur_pseudo'];
                 $_SESSION['niveau'] = strtolower($user['niveau_libelle']);
-
                 $_SESSION['utilisateur_nom'] = $user['utilisateur_nom'];
                 $_SESSION['utilisateur_prenom'] = $user['utilisateur_prenom'];
                 $_SESSION['utilisateur_photo'] = $user['utilisateur_photo'];
@@ -32,14 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $erreur = "Mot de passe incorrect.";
             }
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE utilisateur_pseudo = :pseudo");
-            $stmt->execute(['pseudo' => $username]);
-            $existe = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($existe && $existe['utilisateur_est_supprime'] == 1) {
-                $erreur = "Ce compte a été supprimé ou archivé.";
-            } else {
-                $erreur = "Utilisateur introuvable.";
-            }
+            $erreur = "Utilisateur introuvable.";
         }
     }
 }

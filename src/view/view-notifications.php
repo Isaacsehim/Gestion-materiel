@@ -1,30 +1,44 @@
 <?php require_once(__DIR__ . '/../template/header.php'); ?>
 
-<main class="container">
-  <section class="section">
-    <h1>Historique des connexions</h1>
+<main class="container-bento section">
+  <section class="card">
+    <h1 class="titre-section" tabindex="0">Historique des connexions</h1>
+
+    <form method="POST" action="/?page=mark-notification-read" class="formulaire-modif">
+      <input type="hidden" name="notification_id" value="<?= (int)$notification['id_notification'] ?>">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+      <button type="submit" class="btn btn-validation" tabindex="0">Marquer comme lue</button>
+    </form>
 
     <?php if (empty($notifications)): ?>
-      <p>Aucune connexion enregistrée.</p>
+      <p class="message-info" tabindex="0">Aucune connexion enregistrée.</p>
     <?php else: ?>
-      <table class="table-liste">
-        <thead>
-          <tr>
-            <th>Utilisateur</th>
-            <th>Date & Heure</th>
-            <th>Adresse IP</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($notifications as $notif): ?>
+      <div class="table-responsive">
+        <table class="table-liste">
+          <thead>
             <tr>
-              <td><?= htmlspecialchars($notif['utilisateur_pseudo'] . ' (' . $notif['utilisateur_nom'] . ' ' . $notif['utilisateur_prenom'] . ')') ?></td>
-              <td><?= htmlspecialchars($notif['date_connexion']) ?></td>
-              <td><?= htmlspecialchars($notif['adresse_ip']) ?></td>
+              <th scope="col">Utilisateur</th>
+              <th scope="col">Date & Heure</th>
+              <th scope="col">Adresse IP</th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php foreach ($notifications as $notif): ?>
+              <tr>
+                <td tabindex="0">
+                  <?= htmlspecialchars($notif['utilisateur_pseudo'] . ' (' . $notif['utilisateur_nom'] . ' ' . $notif['utilisateur_prenom'] . ')') ?>
+                </td>
+                <td tabindex="0">
+                  <?= htmlspecialchars($notif['date_connexion']) ?>
+                </td>
+                <td tabindex="0">
+                  <?= htmlspecialchars($notif['adresse_ip']) ?>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
 
       <?php 
       $totalPages = ceil($total / $limit);
@@ -36,4 +50,3 @@
 </main>
 
 <?php require_once(__DIR__ . '/../template/footer.php'); ?>
-

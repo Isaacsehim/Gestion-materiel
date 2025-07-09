@@ -3,6 +3,10 @@ require_once(__DIR__ . '/../config/config.php');
 
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $page = $_GET['page'] ?? 'accueil';
 
 $pagesPubliques = [
@@ -50,13 +54,25 @@ switch ($page) {
 
     case 'utilisateurs':
     case 'update-utilisateur':
-    case 'supprimer-utilisateur':
         if (!checkAccess(['admin'])) {
             header('Location: /?page=error&code=403');
             exit;
         }
         require_once(SRC_PATH . "/controller/controller-{$page}.php");
         break;
+
+    case 'supprimer-utilisateur':
+        $isAdmin = checkAccess(['admin']);
+        $isSelfDelete = isset($_SESSION['user_id'], $_GET['id']) && ((int)$_SESSION['user_id'] === (int)$_GET['id']);
+
+        if (!$isAdmin && !$isSelfDelete) {
+            header('Location: /?page=error&code=403');
+            exit;
+        }
+
+        require_once(SRC_PATH . "/controller/controller-supprimer-utilisateur.php");
+        break;
+
 
     case 'profil-utilisateur':
         if (!checkAccess(['admin', 'user'])) {

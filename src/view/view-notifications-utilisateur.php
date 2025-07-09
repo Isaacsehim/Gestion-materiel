@@ -1,27 +1,43 @@
 <?php require_once(__DIR__ . '/../template/header.php'); ?>
+<?php require_once(__DIR__ . '/../template/sidebar.php'); ?>
 
-<main class="container">
-  <section class="section">
-    <h1>Mes notifications</h1>
+<main class="container-bento section">
+  <section class="card">
+    <h1 class="titre-section" tabindex="0">Historique des connexions</h1>
 
     <?php if (empty($notifications)): ?>
-      <p>Aucune notification pour le moment.</p>
+      <p class="message-info">Aucune connexion enregistrée.</p>
     <?php else: ?>
-      <ul class="notifications-list">
-        <?php foreach ($notifications as $notif): ?>
-          <li class="<?= $notif['notification_lue'] == 0 ? 'non-lue' : 'lue' ?>">
-            <strong><?= htmlspecialchars($notif['type_libelle']) ?> :</strong>
-            <?= nl2br(htmlspecialchars($notif['notification_message'])) ?>
-            <br>
-            <small><?= htmlspecialchars($notif['notification_date']) ?></small>
-            <?php if ($notif['notification_lue'] == 0): ?>
-              <a href="/?page=mark-notification-read&id=<?= $notif['id_notification'] ?>" class="btn btn-update">
-                Marquer comme lu
-              </a>
-            <?php endif; ?>
-          </li>
-        <?php endforeach; ?>
-      </ul>
+      <div class="table-responsive">
+        <table class="table-liste">
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Date & Heure</th>
+              <th>Adresse IP</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($notifications as $notif): ?>
+              <tr>
+                <td><?= htmlspecialchars($notif['utilisateur_pseudo'] . ' (' . $notif['utilisateur_nom'] . ' ' . $notif['utilisateur_prenom'] . ')') ?></td>
+                <td><?= htmlspecialchars($notif['date_connexion']) ?></td>
+                <td><?= htmlspecialchars($notif['adresse_ip']) ?></td>
+                <td>
+                  <form method="post" action="/?page=mark-notification-read">
+                    <input type="hidden" name="notification_id" value="<?= (int)$notif['id_notification'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                    <button type="submit" class="btn btn-validation" tabindex="0">
+                      <i class="fas fa-check icone" aria-hidden="true"></i> Marquer comme lue
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
 
       <?php 
       $totalPages = ceil($total / $limit);

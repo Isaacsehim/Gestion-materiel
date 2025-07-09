@@ -71,7 +71,7 @@ function registerUser(array $data): bool
         'prenom'        => $data['utilisateur_prenom'],
         'pseudo'        => $data['utilisateur_pseudo'],
         'email'         => $data['utilisateur_email'],
-        'motdepasse'    => password_hash($data['utilisateur_motdepasse'], PASSWORD_DEFAULT),
+        'motdepasse' => $data['utilisateur_motdepasse'],
         'photo'         => $data['utilisateur_photo'] ?? null,
         'theme'         => $data['utilisateur_theme'],
         'notifications' => $data['utilisateur_notifications'],

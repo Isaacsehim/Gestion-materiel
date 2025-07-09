@@ -7,16 +7,20 @@ if (($_SESSION['niveau'] ?? '') !== 'admin') {
 }
 
 $id = (int)($_GET['id'] ?? 0);
-$confirmation = $_GET['confirm'] ?? 'non';
+$confirmation = $_GET['confirm'] ?? null;
+
+$erreur = '';
+$success = '';
 
 if (!$id || !($produit = getProduitById($id))) {
     die("Produit introuvable.");
 }
 
-$erreur = '';
-$success = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die('Requête invalide (CSRF).');
+    }
 
-if ($confirmation === 'oui') {
     if (supprimerProduit($id)) {
         header('Location: /?page=produits&delete=success');
         exit;
@@ -25,5 +29,4 @@ if ($confirmation === 'oui') {
     }
 }
 
-// Charger la vue de confirmation de suppression
 require_once(SRC_PATH . '/view/view-supprimer-produit.php');

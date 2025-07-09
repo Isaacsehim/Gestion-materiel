@@ -335,8 +335,8 @@ INSERT INTO utilisateurs (
     'SEHIM',
     'Isaac',
     'IsaacS',
-    'IsaacS',
-    '$2y$10$sU8gQw9OQJtWDP5UrFOQKuAuwAWdeD4ABz9q5UN3WRhyYJFiEcTbi',
+    'isaac@example.com',
+    '$2y$10$uENPAkuRh8nrQz7LLjW1yuiA5FJhQqjeDIkIjzGSptdZVVFBIQhkG',
     'assets/images/utilisateurs/admin_photo.jpg',
     '0632821199',
     'sombre',
@@ -348,6 +348,8 @@ INSERT INTO utilisateurs (
     NOW() - INTERVAL 1 MONTH,
     0
 );
+
+
 
 INSERT INTO etats_produits (etat_libelle) VALUES
 ('Neuf'),
